@@ -1,0 +1,17 @@
+Clovece nehnevaj sa:
+
+sprites:
+	mapa
+	hraci
+	menu
+	kocky
+
+functions:
+	PVP
+	PVE
+	pri vyhadzovani minihra
+
+bmg:
+	Miro Zbirka
+
+

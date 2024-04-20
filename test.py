@@ -23,9 +23,9 @@ class Pohybujuci_panacik():
         self.idk()
 
     def idk(self):
-        self.spites: list = [r".\stefancik\panacik sprites\panacik_sprite_0.png",
-                             r".\stefancik\panacik sprites\panacik_sprite_1.png",
-                             r".\stefancik\panacik sprites\panacik_sprite_2.png"]
+        self.spites: list = ["./panacik_sprites/panacik_sprite_0.png",
+                             "./panacik_sprites/panacik_sprite_1.png",
+                             "./panacik_sprites/panacik_sprite_2.png"]
         
         self.load_spites: list = []
         for i in self.spites:

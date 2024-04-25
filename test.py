@@ -1,5 +1,5 @@
 import pygame as pg
-import random as ran
+# import random
 
 pg.init()
 

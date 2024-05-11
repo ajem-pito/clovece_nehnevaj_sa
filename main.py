@@ -3,23 +3,23 @@ import random as ran
 
 #moje importy
 from panacik import Panacik
+from hrac import Hrac
+from menu import Menu
 
 pg.init()
 
 # konstanty
 # to su nahodne cisla, ktore som si len tak vymyslel, casom ich mozme zmenit
-SCREEN_WIDTH= 1000
+SCREEN_WIDTH= 1400
 SCREEN_HEIGHT = 800
-FPS = 5
+FPS = 60
 
-PANACIK_SIZE = (30, 60) #idkk nepamtam si presne velkost panacika
+PANACIK_SIZE = (30, 60) # x, y 
+PANACIK_SCALE = 1
 
 # farby RGB (red, green, blue)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-
-class Hrac:
-    ...
 
 class Hra():
     def __init__(self) -> None:
@@ -27,8 +27,16 @@ class Hra():
         self.clock = pg.time.Clock()
         pg.display.set_caption("Clovece nehnevaj sa")
         self.running = True
-        self.panacik = Panacik(self.screen, 300, 300, "red", 0, 30, 60)
-        self.panacik_2 = Panacik(self.screen, 400, 300, "red", 0, 30, 60, 2)
+
+        self.hraci = [
+                      Hrac(self.screen,"red", (100, 100)),
+                      Hrac(self.screen,"green", (100, 200)),
+                      Hrac(self.screen,"blue", (100, 300)), 
+                      Hrac(self.screen,"yellow", (100, 400))
+                      ]
+
+    def hod_kockou_screen(self, hrac) -> None: # treba pozmenit nazov idkk
+        self.hod_kockou_screen = ...
 
     def game_loop(self) -> None:
         while self.running:
@@ -45,9 +53,11 @@ class Hra():
                         print("kliknutie", pos)
             
             pos = pg.mouse.get_pos()
-            self.screen.blit(self.panacik.hover(pos), (self.panacik.x, self.panacik.y))
-            self.screen.blit(self.panacik_2.hover(pos), (self.panacik_2.x, self.panacik_2.y))
-
+            
+            for hrac in self.hraci:
+                for panacik in hrac.panacikovia:
+                    self.screen.blit(panacik.hover(pos), (panacik.x, panacik.y))
+        
             pg.display.flip()
             self.clock.tick(FPS)
 

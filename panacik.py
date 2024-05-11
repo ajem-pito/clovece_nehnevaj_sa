@@ -10,13 +10,14 @@ class Panacik:
         self.scale = scale
         self.frame = frame
         self.is_clicked_var = False
+        self.pohyb: bool = False
         self.n = 0
 
         self.farba_panacik_dict = {
                       "red": r"panacik_sprites/cerveny panacik sprites.png", 
-                      "green": r"", 
-                      "blue": r"", 
-                      "yellow": r"", 
+                      "green": r"panacik_sprites/zeleny panacik sprites.png", 
+                      "blue": r"panacik_sprites/modry panacik sprites.png", 
+                      "yellow": r"panacik_sprites/zlty panacik sprites.png", 
                       "purple": r"", 
                       "orange": r"", 
                       "brown": r"", 
@@ -66,16 +67,22 @@ class Panacik:
     def pohyb_update(self) -> None:
         ...
 
-    def hover(self, hover) -> pg.Surface:
-        if hover[0] in range(self.x, self.x + self.width * self.scale) and hover[1] in range(self.y, self.y + self.height * self.scale):
+    def hover(self, pos) -> pg.Surface:
+        if pos[0] in range(self.x, self.x + self.width * self.scale) and pos[1] in range(self.y, self.y + self.height * self.scale):
             self.n = (self.n + 1) % 2
+            pg.time.delay(100)
             return self.get_image(self.glow[self.n])
         else:
             self.n = 0
             return self.get_image(frame=0)
     
     def is_clicked_func(self, pos):
-        ...           
+        if pos[0] in range(self.x, self.x + self.width * self.scale) and pos[1] in range(self.y, self.y + self.height * self.scale):
+            self.is_clicked_var = True 
+
+        elif self.is_clicked_var:
+            self.pohyb_update()
+            self.is_clicked_var = False     
 
     def draw(self) -> None:
         ...

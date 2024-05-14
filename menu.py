@@ -109,7 +109,7 @@ class VytvorText2:
 if __name__ == "__main__":
     menu = Menu()
     menu.menu_loop()
-    pg.quit()
+    
 
 # import pygame as pg
 

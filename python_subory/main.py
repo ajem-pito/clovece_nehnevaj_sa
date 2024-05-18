@@ -21,6 +21,7 @@ PANACIK_SCALE = 1
 # farby RGB (red, green, blue)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+GRAY = (150, 150, 150)
 
 class HracInterface:
     def __init__(self) -> None:
@@ -29,15 +30,16 @@ class HracInterface:
 class Hra():
     def __init__(self) -> None:
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen.blit(pg.image.load("mapa01.png"), (0, 0))
         self.clock = pg.time.Clock()
         pg.display.set_caption("Clovece nehnevaj sa")
         self.running = True
 
         self.hraci = [
-                      Hrac(self.screen,"red", (100, 100)),
-                      Hrac(self.screen,"green", (100, 200)),
-                      Hrac(self.screen,"blue", (100, 300)), 
-                      Hrac(self.screen,"yellow", (100, 400))
+                      Hrac(self.screen,"red", (17, 2)),
+                      Hrac(self.screen,"green", (995, 2)),
+                      Hrac(self.screen,"blue", (17, 720)), 
+                      Hrac(self.screen,"yellow", (995, 720))
                       ]
         
         self.mapa = Mapa()
@@ -48,7 +50,8 @@ class Hra():
     def game_loop(self) -> None:
         while self.running:
             
-            self.screen.fill((102,153,204))
+            self.screen.fill(GRAY)
+            self.screen.blit(pg.image.load("mapa01.png"), (0, 0))
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -68,7 +71,7 @@ class Hra():
                     pos = pg.mouse.get_pos()
                     if (pos[0] in range(panacik.x, panacik.x + panacik.width * panacik.scale) and
                         pos[1] in range(panacik.y, panacik.y + panacik.height * panacik.scale)) or (panacik.is_clicked_var == True):
-                        self.screen.blit(panacik.get_image(0), (panacik.x, panacik.y))
+                        self.screen.blit(panacik.hover(), (panacik.x, panacik.y))
 
                     # elif panacik.is_clicked_var == True and pos[0] in range(SCREEN_WIDTH//2, SCREEN_WIDTH) and pos[1] in range(SCREEN_HEIGHT//2, SCREEN_HEIGHT):
                     #     self.screen.blit(panacik.pohyb(pos), (panacik.x, panacik.y))

@@ -14,4 +14,8 @@ functions:
 bmg:
 	Miro Zbirka
 
-
+tema:
+	ganster
+	vojna gangov
+	nasilie
+	vulgarizmy

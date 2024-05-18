@@ -14,7 +14,7 @@ class Menu:
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.screen.fill((200, 248, 255))
         
-        self.text = " Clovece nehnevaj sa"
+        self.text = " Človeče nehnevaj sa"
         self.font_size = 40
         self.text_l = pg.font.Font(None, self.font_size).size(self.text)[0]
         self.hustota = SCREEN_WIDTH // self.text_l
@@ -33,16 +33,16 @@ class Menu:
 
     def vytvor_text(self) -> None:
         # pre 1. riadok
-        for i in range(self.hustota+3):
-            self.nadpisi_1.append(VytvorText2(self.screen, self.text, 40, (i*self.text_l, 100), font_path=None, speed=1))
+        for i in range(self.hustota+1):
+            self.nadpisi_1.append(VytvorText2(self.screen, self.text, 40, (i*self.text_l, 100), font_path=None, speed=0.5))
         
         # pre 2. riadok
-        for i in range(self.hustota+3):
-            self.nadpisi_2.append(VytvorText2(self.screen, self.text, 40, (i*self.text_l, 140), font_path=None, speed=1))
+        for i in range(self.hustota+2):
+            self.nadpisi_2.append(VytvorText2(self.screen, self.text, 40, (i*self.text_l, 140), font_path=None, speed=0.5))
         
         # pre 3. riadok
-        for i in range(self.hustota+3):
-            self.nadpisi_3.append(VytvorText2(self.screen, self.text, 40, (i*self.text_l, 180), font_path=None, speed=1))
+        for i in range(self.hustota+1):
+            self.nadpisi_3.append(VytvorText2(self.screen, self.text, 40, (i*self.text_l, 180), font_path=None, speed=0.5))
 
         self.start_button = VytvorText2(self.screen, "START", 80, (0, 500), font_path=None, text_color= (255,0,0), hover_color=(255,0,100))
         self.save_button = VytvorText2(self.screen, "SAVE", 80, (0,600), font_path=None, text_color= (255,0,0), hover_color=(255,0,100))

@@ -7,7 +7,8 @@ class Hrac:
         self.id = id
         self.farba = farba
         self.x, self.y = pos # pos == indexy x,y v mriezke
-    
+        self.kliknuty = None
+
         self.panacikovia = self.vytvor_panacikov(4)
 
     def __repr__(self) -> str:
@@ -25,6 +26,7 @@ class NPC:
         self.id = id
         self.farba = farba
         self.x, self.y = pos # pos == indexy x,y v mriezke
+        self.kliknuty = None
 
         self.panacikovia = self.vytvor_panacikov(4)
 

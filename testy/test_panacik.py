@@ -1,7 +1,7 @@
 import pygame as pg
 
 class Panacik:
-    def __init__(self, x:int, y:int, farba:str = "red", frame:int = 0, width=30, height=60, scale:int=1, screen:pg.Surface = None) -> None:
+    def __init__(self, x:int, y:int, farba:str = "red", frame:int = 0, width=30, height=60, scale:int=1, screen:pg.Surface = None, speed:int = 5) -> None:
         self.screen = screen
         self.x = x
         self.y = y
@@ -9,6 +9,7 @@ class Panacik:
         self.height = height
         self.scale = scale
         self.frame = frame
+        self.speed = speed
         self.is_clicked_var = False
         self.pohyb_bool: bool = False # nie som si isty ci to je potreba ci niekedy pouzijem ale necham este
         self.poloha: int = 0
@@ -77,3 +78,8 @@ class Panacik:
     def idle(self) -> None:
         self.idle_var = (self.idle_var + 1) % 4
         return self.get_image(self.idle_list[self.idle_var])
+    
+    # pre menu
+    def update(self) -> None:
+        self.x -= self.speed
+        self.y += self.speed

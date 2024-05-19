@@ -26,7 +26,6 @@ FPS = 60
 class Hra:
     def __init__(self, n_hracov: int) -> None:
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.screen.fill(WHITE)
         pg.display.set_caption("Clovece nehnevaj sa")
         self.clock = pg.time.Clock()
         self.running = True

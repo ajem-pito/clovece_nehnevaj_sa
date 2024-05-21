@@ -39,10 +39,12 @@ class Hra:
         self.panacik = Panacik(0, 0)
 
     def vytvor_hracov(self, n) -> list[object]:
+        self.hrac_n = 0
         list = []
         farba = ["red", "blue", "green", "yellow"]
         pos = [(1,3), (1,11), (16,3), (16,11)]
         max = 4
+
 
         for id in range(max):
             if id <= n:
@@ -80,43 +82,49 @@ class Hra:
     def game_loop(self) -> None:
         while self.running:
             
-            self.screen.fill(BLACK)
-            self.screen.blit(self.background_map, (0,0))
+            self.screen.fill(WHITE)
+            # self.screen.blit(self.background_map, (0,0))
             # self.screen.blit(self.cerveny_panacik, (120,120), area=(0,0,120,120))
 
-            for hrac in self.hraci:
-                for panacik in hrac.panacikovia:
-                    for event in pg.event.get():
-                        if event.type == pg.QUIT:
-                            self.running = False
-                        elif event.type == pg.MOUSEBUTTONDOWN:
-                            if event.button == 1:
-                                mys_pos = pg.mouse.get_pos()
-                                x = mys_pos[0] // VELKOST[0] // 2 
-                                y = mys_pos[1] // VELKOST[1]
-                                self.panacik.x = x*VELKOST[0] * 2 + 15
-                                self.panacik.y = y*VELKOST[1]
-
-                    x = panacik.x * 60 + 15
-                    y = panacik.y*60  
+            # for hrac in self.hraci:
+            #     for panacik in hrac.panacikovia:
+            #         panacik.timer += 0.1
+            #         self.screen.blit(panacik.get_image(0), (self.panacik.x, self.panacik.y))
                     
-                    mys_pos = pg.mouse.get_pos()
+            for panacik in self.hraci[self.hrac_n].panacikovia:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        self.running = False
+                    elif event.type == pg.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            mys_pos = pg.mouse.get_pos()
+                            x = mys_pos[0] // VELKOST[0] // 2 
+                            y = mys_pos[1] // VELKOST[1]
+                            # self.panacik.x = x*VELKOST[0] * 2 + 15
+                            # self.panacik.y = y*VELKOST[1]
+                            self.hrac_n = (self.hrac_n + 1) % 4
+                            print(f"X: {x}, Y: {y}")
+            
+                x = panacik.x * 60 + 15
+                y = panacik.y * 60  
+                
+                mys_pos = pg.mouse.get_pos()
 
-                    if (mys_pos[0] in range(x, x + panacik.width * panacik.scale) and
-                        mys_pos[1] in range(y, y + panacik.height * panacik.scale)) or (panacik.is_clicked_var == True):
-                        self.screen.blit(panacik.hover(), (x, y))
-                    
-                    elif panacik.timer > 3:
-                        self.screen.blit(panacik.idle(), (x, y))
+                if (mys_pos[0] in range(x, x + panacik.width * panacik.scale) and
+                    mys_pos[1] in range(y, y + panacik.height * panacik.scale)) or (panacik.is_clicked_var == True):
+                    self.screen.blit(panacik.hover(), (x, y))
+                
+                elif panacik.timer > 3:
+                    self.screen.blit(panacik.idle(), (x, y))
 
-                    else:
-                        self.screen.blit(panacik.get_image(0), (x, y))
+                else:
+                    self.screen.blit(panacik.get_image(0), (x, y))
 
-                    panacik.timer += 0.1
+                panacik.timer += 0.1
 
-                    self.screen.blit(self.panacik.get_image(0), (self.panacik.x, self.panacik.y))
+                self.screen.blit(self.panacik.get_image(0), (self.panacik.x, self.panacik.y))
 
-            # self.debug_mriezka()
+            self.debug_mriezka()
 
             pg.display.flip()
             pg.time.delay(80)

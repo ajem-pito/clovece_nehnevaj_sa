@@ -81,5 +81,8 @@ class Panacik:
     
     # pre menu
     def update(self) -> None:
+        # if self.x and self.y < 900:
+            # return False
+        # else:
         self.x -= self.speed
         self.y += self.speed

@@ -4,7 +4,7 @@ import random as rand
 from test_panacik import Panacik
 pg.init()
 
-SCREEN_WIDTH = 1400
+SCREEN_WIDTH = 1500
 SCREEN_HEIGHT = 900
 FPS = 60
 
@@ -16,36 +16,45 @@ class Menu:
         self.clock = pg.time.Clock()
         self.panacikovia = []
 
-        self.vytvor_text()
+        self.vytvor_texty()
 
-    def vytvor_text(self):
+    def vytvor_texty(self):
         text = "CLOVECE*NEHNEVAJ*SA*"
-        x,y = (0, 100)
         font_velkost = 40
         font_path = r"font/ONESIZE.ttf"
-        # font_path = r"font/Arcade.ttf"
-        # font_path = None
         font = pg.font.Font(font_path, font_velkost)
-        velkost_textu: tuple = font.size(text)
-        # self.text: list[list[object]] = [[Vytvor_text(self.screen, text, (pos[0], pos[1] + x*80), font_velkost, font_path) for y in range(SCREEN_WIDTH // font.size(text)[0])] for x in range(3)]
+
+        self.velkost_textu: tuple = font.size(text)
+        image = font.render(text, True, (0,0,0))
+        # text_rect: tuple[int,int,int,int] = image.get_rect(topleft=(x,y))
         
+        # print(f"Text: {velkost_textu} Rect: {text_rect}")
+
+        max_velkost = -self.velkost_textu[0]
+        while max_velkost < SCREEN_WIDTH:
+            max_velkost += self.velkost_textu[0]
+
+        x,y = (-self.velkost_textu[0], 100)
+
         self.text = []
         for i in range(3):
-            riadok  = []
-            for j in range(SCREEN_WIDTH // velkost_textu[0] + 1):
+            riadok = []
+            for j in range(max_velkost//self.velkost_textu[0]+1):
                 if i == 1:
-                    riadok.append(Vytvor_text(self.screen, text, (x+j*velkost_textu[0],y+i*velkost_textu[1]), font_velkost, font_path, reverse=True))
+                    riadok.append(Vytvor_text(self.screen, text, (x + j*self.velkost_textu[0],y + i * self.velkost_textu[1]), 
+                                              font_velkost, max_velkost, font_path, 1, button=False, reverse=True))
                 else:
-                    riadok.append(Vytvor_text(self.screen, text, (x+j*velkost_textu[0],y+i*velkost_textu[1]), font_velkost, font_path))
+                    riadok.append(Vytvor_text(self.screen, text, (x + j*self.velkost_textu[0],y + i * self.velkost_textu[1]),
+                                              font_velkost, max_velkost, font_path, 1, button=False))
             self.text.append(riadok)
 
         # width = self.text[0][0].font.size(text)[0]
         # print(width)
 
-        self.start = Vytvor_text(self.screen, "START", (SCREEN_WIDTH//2,SCREEN_HEIGHT//2), 30, font_path, button=True)
-        self.save = Vytvor_text(self.screen, "SAVE", (SCREEN_WIDTH//2,SCREEN_HEIGHT//2 + velkost_textu[1]), 30, font_path, button=True)
-        self.nastavenia = Vytvor_text(self.screen, "NASTAVENIA", (SCREEN_WIDTH//2,SCREEN_HEIGHT//2 + velkost_textu[1]*2), 30, font_path, button=True)
-        
+        self.tlacidla = []
+        self.texty = ["START", "SAVE", "NASTAVENIA"]
+        for k in range(len(self.texty)):
+            self.tlacidla.append(Vytvor_text(None, self.texty[k], (SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + k*self.velkost_textu[1]), 30, 0, r"font/ONESIZE.ttf", 0, button=True))
 
     def background_panacik(self) -> None:
         # if rand.randint(0,100) > 50:
@@ -67,53 +76,58 @@ class Menu:
                 self.background_panacik()
 
             for panacik in self.panacikovia:
+                self.screen.blit(panacik.get_image(0), (panacik.x, panacik.y))
                 panacik.update()
-                self.screen.blit(panacik.get_image(), (panacik.x, panacik.y))
                     
-            for line in self.text:
-                for text in line:
-                    text.update()
+            for riadok in self.text:
+                for text in riadok:
                     image, rect = text.draw()
                     self.screen.blit(image, rect)
-
-            jo = self.start.draw()
-            self.screen.blit(jo[0], jo[1])
-            jo = self.save.draw()
-            self.screen.blit(jo[0], jo[1])
-            jo = self.nastavenia.draw()
-            self.screen.blit(jo[0], jo[1])
+                    text.update()
+            
+            for tlacidlo in self.tlacidla:
+                x,y = pg.mouse.get_pos()
+                if x in range(tlacidlo.x - tlacidlo.velkost_textu[0], tlacidlo.x + tlacidlo.velkost_textu[0]) and y in range(tlacidlo.y - tlacidlo.velkost_textu[1]//2, tlacidlo.y + tlacidlo.velkost_textu[1]//2):
+                    tlacidlo.text = '> ' + tlacidlo.origo_text + ' <'
+                    tlacidlo.hover = True
+                else:
+                    tlacidlo.text = tlacidlo.origo_text
+                    tlacidlo.hover = False
+                image, rect = tlacidlo.draw()
+                self.screen.blit(image, rect)
 
             pg.display.flip()
-
             self.clock.tick(FPS)
 
 
 class Vytvor_text:
-    def __init__(self, screen: pg.Surface, text: str, pos: tuple[int, int], font_velkost: int, font_path: str = None, speed: float = 1,
+    def __init__(self, screen: pg.Surface, text: str, pos: tuple[int, int], font_velkost: int, max_velkost: int, font_path: str = None, speed: float = 1,
                  farba: tuple[int, int, int] = (0,0,0), hover_farba:tuple[int, int, int] = (255,0,0), reverse: bool = False, button: bool = False) -> None:
         self.screen = screen
-        self.text = text
+        self.text, self.origo_text = text, text
         self.x, self.y = pos
+        self.max_velkost: int = max_velkost
         self.font = pg.font.Font(font_path, font_velkost)
-        self.velkost_text:tuple[int, int] = self.font.size(text)
+        self.velkost_textu:tuple[int, int] = self.font.size(text)
         self.speed = speed if not reverse else -speed
         self.farba = farba
         self.hover_farba = hover_farba
         self.reverse = reverse
         self.button = button
-
+        self.hover = False
         self.skuska = ["self.rect = self.image.get_rect(topleft=(self.x, self.y))",
                        "self.rect = self.image.get_rect(center=(self.x, self.y))"]
 
     def update(self) -> None:
         self.x += self.speed
-        if self.x > SCREEN_WIDTH and not self.reverse:
-            self.x = 0 - self.velkost_text[0]
-        elif self.x < 0 - self.velkost_text[0] and self.reverse:
-            self.x = SCREEN_WIDTH + self.velkost_text[0]
+        if self.x >= self.max_velkost:
+            self.x = -self.velkost_textu[0]
+        elif self.reverse and self.x <= -self.velkost_textu[0]:
+            self.x = self.max_velkost
 
-    def draw(self, hover: bool = False) -> tuple[pg.Surface, pg.Rect]:
-        self.image = self.font.render(self.text, True, self.hover_farba if hover else self.farba)
+
+    def draw(self) -> tuple[pg.Surface, pg.Rect]:
+        self.image = self.font.render(self.text, True, self.hover_farba if self.hover else self.farba)
         exec(f"{self.skuska[self.button]}") # obrovsky shoutout pre Alexa V. ze som toto unho videl
         return (self.image, self.rect)
     

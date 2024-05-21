@@ -53,7 +53,7 @@ class Panacik:
         #     self.height = self.height * self.scale
         #     print(self.width, self.height)
 
-        self.get_image()
+        # self.get_image()
 
     def get_image(self, frame = None) -> pg.Surface:
         if frame is not None:

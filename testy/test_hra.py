@@ -5,7 +5,7 @@ import random as rand
 # moje importy 
 from test_hraci import Hrac, NPC
 from test_panacik import Panacik
-from test_logika import Logika
+from test_logika import Logika, Hod_kockou
 
 # inicializacia pygame
 pg.init()
@@ -36,9 +36,31 @@ class Hra:
 
         self.hraci: list[object] = self.vytvor_hracov(n_hracov)
         self.mriezka: list[tuple[int, int]] = self.vytvor_mriezku()
+        self.vytvor_UI()
 
         self.logika = Logika(self.mriezka)
         self.cas = Cas()
+
+    def vytvor_UI(self) -> None:
+        self.hrac_na_rade_text = Vytvor_text(screen=None, text="HRAC NA RADE:", pos=(0,0), font_velkost=22, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+                                        farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
+        self.hrac_na_rade_text2 = Vytvor_text(screen=None, text="1", pos=(0,0), font_velkost=20, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+                                        farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
+        self.hod_kockou_button = Vytvor_text(screen=None, text="HOD KOCKOU", pos=(0,0), font_velkost=30, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+                                             farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=True)
+        self.sprava_text = Vytvor_text(screen=None, text="STATUS:", pos=(0,0), font_velkost=22, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+                                       farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
+        
+        self.hrac_na_rade_text.x = 22*60 - 15
+        self.hrac_na_rade_text.y = 20
+
+        self.hod_kockou_button.x = 23*60
+        self.hod_kockou_button.y = 3*60
+
+        self.sprava_text.x = 22*60 + 15
+        self.sprava_text.y = 6*60
+        
+        self.UI_list = [self.hrac_na_rade_text, self.hod_kockou_button, self.sprava_text]
 
     def vytvor_hracov(self, n) -> list[object]:
         self.hrac_n = 0
@@ -47,15 +69,11 @@ class Hra:
         pos = [(1,3), (1,11), (16,3), (16,11)]
         max = 4
 
-
         for id in range(max):
             if id <= n:
                 list.append(Hrac(id, farba[id], pos[id]))
             else: 
                 list.append(NPC(id, farba[id], pos[id]))
-
-        # for hrac in list:
-        #     print(hrac)
 
         return list
     
@@ -67,9 +85,6 @@ class Hra:
             for j in range(0, SCREEN_HEIGHT // VELKOST[1]): # stlpec
                 underlist.append((i,j, None))
             list.append(underlist)
-
-        # for riadok in list:
-        #     print(riadok)
         
         return list
 
@@ -82,35 +97,42 @@ class Hra:
             pg.draw.line(self.screen, BLACK, (0, j*VELKOST[1]), (SCREEN_WIDTH, j*VELKOST[1]), 2)
 
     def game_loop(self) -> None:
+        hod_kockou_var = Hod_kockou()
+        n = 1
+
         while self.running:
-            
-            self.screen.fill(WHITE)
+
+            # cas - nefunguje
+            self.cas.update()
+            image, rect = self.cas.text.draw()
+            self.screen.blit(image, rect)
+
+            self.screen.fill((128, 128, 128))
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if self.hod_kockou_button.on_click(pg.mouse.get_pos()):
+                            n = self.logika.hod_kockou(self.hraci[self.hrac_n])
+                            print(n)
             
             self.screen.blit(self.background_map, (0,0))
-            # self.screen.blit(self.cerveny_panacik, (120,120), area=(0,0,120,120))
+            self.screen.blit(hod_kockou_var.return_image(n), (22*60,3*60+30))
 
-            # for hrac in self.hraci:
-            #     for panacik in hrac.panacikovia:
-            #         panacik.timer += 0.1
-            #         self.screen.blit(panacik.get_image(0), (self.panacik.x, self.panacik.y))
-                    
-            # for panacik in self.hraci[self.hrac_n].panacikovia:
-            #     for event in pg.event.get():
-            #         if event.type == pg.QUIT:
-            #             self.running = False
-            #         elif event.type == pg.MOUSEBUTTONDOWN:
-            #             if event.button == 1:
-            #                 mys_pos = pg.mouse.get_pos()
-            #                 x = mys_pos[0] // VELKOST[0] // 2 
-            #                 y = mys_pos[1] // VELKOST[1]
-            #                 # self.panacik.x = x*VELKOST[0] * 2 + 15
-            #                 # self.panacik.y = y*VELKOST[1]
-            #                 self.hrac_n = (self.hrac_n + 1) % 4
-            #                 print(f"X: {x}, Y: {y}")
+            for text in self.UI_list:
+                if self.hod_kockou_button.rect.collidepoint(pg.mouse.get_pos()):
+                    self.hod_kockou_button.text = '> ' + self.hod_kockou_button.origo_text + ' <'
+                    self.hod_kockou_button.hover = True
+                else:
+                    self.hod_kockou_button.text = self.hod_kockou_button.origo_text
+                    self.hod_kockou_button.hover = False
+
+                image, rect = text.draw()
+                self.screen.blit(image, rect)
+
+            # sluzi asi len na to, aby sa panacik zobrazil na spravnom mieste
             for hrac in self.hraci:
                 for panacik in hrac.panacikovia:
                     x = panacik.x * 60 + 15
@@ -119,7 +141,7 @@ class Hra:
                     if panacik.rect.collidepoint(pg.mouse.get_pos()) or panacik.is_clicked_var == True:
                         self.screen.blit(panacik.hover(), (x, y))
                     
-                    elif panacik.timer > 3:
+                    elif panacik.timer == 0:
                         self.screen.blit(panacik.idle(), (x, y))
 
                     else:
@@ -127,14 +149,11 @@ class Hra:
                     
                     panacik.timer += 1
 
-            # self.debug_mriezka()
+            # debugy
+            self.debug_mriezka()
 
-            self.cas.update()
-            image, rect = self.cas.text.draw()
-            self.screen.blit(image, rect)
-
+            # update a ticky
             pg.display.flip()
-            pg.time.delay(80)
             self.clock.tick(FPS) 
 
 class Vytvor_text:
@@ -186,18 +205,9 @@ class Cas:
 
     def update(self) -> None:
         cas = pg.time.get_ticks()
-        self.sekundy = cas // 1000
-        
-        if self.sekundy // 60 >= 1:
-            self.minuty += 1
-            
-
-        self.sekundy = self.sekundy % 60
-
-        self.text.text = f"{self.minuty}:{self.sekundy}"
-
-
-
+        sekundy = cas // 1000
+        minuty = sekundy // 60
+        self.text.text = f"{minuty}:{sekundy}"
 
 if __name__ == "__main__":
     hra = Hra(n_hracov=3)

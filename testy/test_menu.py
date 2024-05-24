@@ -109,6 +109,7 @@ class Menu:
                 else:
                     tlacidlo.text = tlacidlo.origo_text
                     tlacidlo.hover = False
+                    
                 image, rect = tlacidlo.draw()
                 self.screen.blit(image, rect)
             

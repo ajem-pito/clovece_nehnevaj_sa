@@ -63,6 +63,7 @@ class Panacik:
         if self.scale != 1:
             self.image = pg.transform.scale(self.image, (self.width * self.scale, self.height * self.scale))
         self.image.set_colorkey((0, 255, 250))
+        self.rect = self.image.get_rect(topleft=(self.x*60+15, self.y*60))
         return self.image
     
     def pohyb(self, pos) -> None:
@@ -81,8 +82,5 @@ class Panacik:
     
     # pre menu
     def update(self) -> None:
-        # if self.x and self.y < 900:
-            # return False
-        # else:
         self.x -= self.speed
         self.y += self.speed

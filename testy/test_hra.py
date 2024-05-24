@@ -5,6 +5,7 @@ import random as rand
 # moje importy 
 from test_hraci import Hrac, NPC
 from test_panacik import Panacik
+from test_logika import Logika
 
 # inicializacia pygame
 pg.init()
@@ -30,13 +31,14 @@ class Hra:
         self.clock = pg.time.Clock()
         self.running = True
 
-        self.background_map = pg.image.load("mapa01.png")
+        self.background_map = pg.image.load("mapa01.png").convert_alpha()
         # self.cerveny_panacik = pg.image.load(r"panacik_sprites/cerveny_hrac.ase")
 
         self.hraci: list[object] = self.vytvor_hracov(n_hracov)
         self.mriezka: list[tuple[int, int]] = self.vytvor_mriezku()
 
-        self.panacik = Panacik(0, 0)
+        self.logika = Logika(self.mriezka)
+        self.cas = Cas()
 
     def vytvor_hracov(self, n) -> list[object]:
         self.hrac_n = 0
@@ -83,7 +85,12 @@ class Hra:
         while self.running:
             
             self.screen.fill(WHITE)
-            # self.screen.blit(self.background_map, (0,0))
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.running = False
+            
+            self.screen.blit(self.background_map, (0,0))
             # self.screen.blit(self.cerveny_panacik, (120,120), area=(0,0,120,120))
 
             # for hrac in self.hraci:
@@ -91,44 +98,106 @@ class Hra:
             #         panacik.timer += 0.1
             #         self.screen.blit(panacik.get_image(0), (self.panacik.x, self.panacik.y))
                     
-            for panacik in self.hraci[self.hrac_n].panacikovia:
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
-                        self.running = False
-                    elif event.type == pg.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            mys_pos = pg.mouse.get_pos()
-                            x = mys_pos[0] // VELKOST[0] // 2 
-                            y = mys_pos[1] // VELKOST[1]
-                            # self.panacik.x = x*VELKOST[0] * 2 + 15
-                            # self.panacik.y = y*VELKOST[1]
-                            self.hrac_n = (self.hrac_n + 1) % 4
-                            print(f"X: {x}, Y: {y}")
-            
-                x = panacik.x * 60 + 15
-                y = panacik.y * 60  
-                
-                mys_pos = pg.mouse.get_pos()
+            # for panacik in self.hraci[self.hrac_n].panacikovia:
+            #     for event in pg.event.get():
+            #         if event.type == pg.QUIT:
+            #             self.running = False
+            #         elif event.type == pg.MOUSEBUTTONDOWN:
+            #             if event.button == 1:
+            #                 mys_pos = pg.mouse.get_pos()
+            #                 x = mys_pos[0] // VELKOST[0] // 2 
+            #                 y = mys_pos[1] // VELKOST[1]
+            #                 # self.panacik.x = x*VELKOST[0] * 2 + 15
+            #                 # self.panacik.y = y*VELKOST[1]
+            #                 self.hrac_n = (self.hrac_n + 1) % 4
+            #                 print(f"X: {x}, Y: {y}")
+            for hrac in self.hraci:
+                for panacik in hrac.panacikovia:
+                    x = panacik.x * 60 + 15
+                    y = panacik.y * 60  
+                    
+                    if panacik.rect.collidepoint(pg.mouse.get_pos()) or panacik.is_clicked_var == True:
+                        self.screen.blit(panacik.hover(), (x, y))
+                    
+                    elif panacik.timer > 3:
+                        self.screen.blit(panacik.idle(), (x, y))
 
-                if (mys_pos[0] in range(x, x + panacik.width * panacik.scale) and
-                    mys_pos[1] in range(y, y + panacik.height * panacik.scale)) or (panacik.is_clicked_var == True):
-                    self.screen.blit(panacik.hover(), (x, y))
-                
-                elif panacik.timer > 3:
-                    self.screen.blit(panacik.idle(), (x, y))
+                    else:
+                        self.screen.blit(panacik.get_image(0), (x, y))
+                    
+                    panacik.timer += 1
 
-                else:
-                    self.screen.blit(panacik.get_image(0), (x, y))
+            # self.debug_mriezka()
 
-                panacik.timer += 0.1
-
-                self.screen.blit(self.panacik.get_image(0), (self.panacik.x, self.panacik.y))
-
-            self.debug_mriezka()
+            self.cas.update()
+            image, rect = self.cas.text.draw()
+            self.screen.blit(image, rect)
 
             pg.display.flip()
             pg.time.delay(80)
             self.clock.tick(FPS) 
+
+class Vytvor_text:
+    def __init__(self, screen: pg.Surface, text: str, pos: tuple[int, int], font_velkost: int, max_velkost: int, font_path: str = None, speed: float = 1,
+                 farba: tuple[int, int, int] = (0,0,0), hover_farba:tuple[int, int, int] = (255,0,0), reverse: bool = False, button: bool = False) -> None:
+        self.screen = screen
+        self.text, self.origo_text = text, text
+        self.x, self.y = pos
+        self.max_velkost: int = max_velkost
+        self.font = pg.font.Font(font_path, font_velkost)
+        self.velkost_textu:tuple[int, int] = self.font.size(text)
+        self.speed = speed if not reverse else -speed
+        self.farba = farba
+        self.hover_farba = hover_farba
+        self.reverse = reverse
+        self.button = button
+        self.hover = False
+        self.skuska = ["self.rect = self.image.get_rect(topleft=(self.x, self.y))",
+                       "self.rect = self.image.get_rect(center=(self.x, self.y))"]
+        
+        self.image = self.font.render(self.text, True, self.hover_farba if self.hover else self.farba)
+        exec(f"{self.skuska[self.button]}")
+    
+    def update(self) -> None:
+        self.x += self.speed
+        if self.x >= self.max_velkost:
+            self.x = -self.velkost_textu[0]
+        elif self.reverse and self.x <= -self.velkost_textu[0]:
+            self.x = self.max_velkost
+
+    def draw(self) -> tuple[pg.Surface, pg.Rect]:
+        self.image = self.font.render(self.text, True, self.hover_farba if self.hover else self.farba)
+        exec(f"{self.skuska[self.button]}") # obrovsky shoutout pre Alexa V. ze som toto unho videl # aj ked ALex V je cisty frajer, je to picovina jak mraky
+        return (self.image, self.rect)
+    
+    def on_click(self, mys_pos) -> None:
+        return self.rect.collidepoint(mys_pos) 
+
+class Cas:
+    def __init__(self) -> None:
+        self.text = Vytvor_text(screen=None, text="0:0", pos=(0,0), font_velkost=40, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+                                farba=(255,255,255), hover_farba=(255,0,0), reverse=False, button=False)
+        
+        self.velkost_textu: tuple[int, int] = self.text.velkost_textu
+        self.text.x = 11*60 - self.velkost_textu[0]
+        self.text.y = 10
+        self.sekundy = 0
+        self.minuty = 0
+
+    def update(self) -> None:
+        cas = pg.time.get_ticks()
+        self.sekundy = cas // 1000
+        
+        if self.sekundy // 60 >= 1:
+            self.minuty += 1
+            
+
+        self.sekundy = self.sekundy % 60
+
+        self.text.text = f"{self.minuty}:{self.sekundy}"
+
+
+
 
 if __name__ == "__main__":
     hra = Hra(n_hracov=3)

@@ -17,6 +17,7 @@ class Menu:
         self.panacikovia = []
 
         self.vytvor_texty()
+        self.background_panacik()
 
     def vytvor_texty(self):
         text = "CLOVECE*NEHNEVAJ*SA*"
@@ -56,26 +57,42 @@ class Menu:
         for k in range(len(self.texty)):
             self.tlacidla.append(Vytvor_text(None, self.texty[k], (SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + k*self.velkost_textu[1]), 30, 0, r"font/ONESIZE.ttf", 0, button=True))
 
-    def background_panacik(self) -> None:
-        # if rand.randint(0,100) > 50:
-        x = rand.randint(200, SCREEN_WIDTH+600)
-        y = -60            
-            
-        farba = rand.choice(["red", "green", "blue", "yellow"])
-        self.panacikovia.append(Panacik(x,y,farba,1, scale=1, speed=3))
+        self.podpis = Vytvor_text(None, "Jakub J. Stefancik, 2024", (SCREEN_WIDTH-350, SCREEN_HEIGHT-30), 25, 0, font_path, 0, farba=(128, 128, 128))
 
-    def menu_loop(self):
+    def background_panacik(self) -> None:        
+        farba = ["red", "green", "blue", "yellow"]
+
+        for farbicka in farba:
+            for _ in range(4):
+                x = rand.randint(0, SCREEN_WIDTH+60)
+                y = rand.randint(0, SCREEN_HEIGHT+60)            
+                self.panacikovia.append(Panacik(x,y,farbicka,1, scale=1, speed=3))
+
+    def menu_loop(self) -> None:
         while self.running:
             self.screen.fill((255,255,255))
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
-            
-            if rand.randint(0,100) < 5:
-                self.background_panacik()
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            if self.tlacidla[0].on_click(pg.mouse.get_pos()):
+                                print("Start")
+                            elif self.tlacidla[1].on_click(pg.mouse.get_pos()):
+                                print("Save")
+                            elif self.tlacidla[2].on_click(pg.mouse.get_pos()):
+                                print("Nastavenia")
+                                
+                            # for tlacidlo in self.tlacidla:
+                            #     if tlacidlo.on_click(pg.mouse.get_pos()):
+                            #         print(tlacidlo.origo_text)
 
             for panacik in self.panacikovia:
+                if panacik.x < -60 or panacik.x > SCREEN_WIDTH+60:
+                    panacik.x = rand.randint(400, SCREEN_WIDTH+60)
+                    panacik.y = -60
+
                 self.screen.blit(panacik.get_image(0), (panacik.x, panacik.y))
                 panacik.update()
                     
@@ -86,8 +103,7 @@ class Menu:
                     text.update()
             
             for tlacidlo in self.tlacidla:
-                x,y = pg.mouse.get_pos()
-                if x in range(tlacidlo.x - tlacidlo.velkost_textu[0], tlacidlo.x + tlacidlo.velkost_textu[0]) and y in range(tlacidlo.y - tlacidlo.velkost_textu[1]//2, tlacidlo.y + tlacidlo.velkost_textu[1]//2):
+                if tlacidlo.rect.collidepoint(pg.mouse.get_pos()):
                     tlacidlo.text = '> ' + tlacidlo.origo_text + ' <'
                     tlacidlo.hover = True
                 else:
@@ -95,6 +111,9 @@ class Menu:
                     tlacidlo.hover = False
                 image, rect = tlacidlo.draw()
                 self.screen.blit(image, rect)
+            
+            image, rect = self.podpis.draw()
+            self.screen.blit(image, rect)
 
             pg.display.flip()
             self.clock.tick(FPS)
@@ -117,7 +136,10 @@ class Vytvor_text:
         self.hover = False
         self.skuska = ["self.rect = self.image.get_rect(topleft=(self.x, self.y))",
                        "self.rect = self.image.get_rect(center=(self.x, self.y))"]
-
+        
+        self.image = self.font.render(self.text, True, self.hover_farba if self.hover else self.farba)
+        exec(f"{self.skuska[self.button]}")
+    
     def update(self) -> None:
         self.x += self.speed
         if self.x >= self.max_velkost:
@@ -125,14 +147,13 @@ class Vytvor_text:
         elif self.reverse and self.x <= -self.velkost_textu[0]:
             self.x = self.max_velkost
 
-
     def draw(self) -> tuple[pg.Surface, pg.Rect]:
         self.image = self.font.render(self.text, True, self.hover_farba if self.hover else self.farba)
-        exec(f"{self.skuska[self.button]}") # obrovsky shoutout pre Alexa V. ze som toto unho videl
+        exec(f"{self.skuska[self.button]}") # obrovsky shoutout pre Alexa V. ze som toto unho videl # aj ked ALex V je cisty frajer, je to picovina jak mraky
         return (self.image, self.rect)
     
-    def on_click(self) -> None:
-        pass
+    def on_click(self, mys_pos) -> None:
+        return self.rect.collidepoint(mys_pos) 
 
 if __name__ == "__main__":
     menu = Menu()

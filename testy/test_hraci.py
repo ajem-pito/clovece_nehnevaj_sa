@@ -1,6 +1,8 @@
 from test_panacik import Panacik
 
 meno_dict = {0: "Jano", 1: "Filip", 2: "Nina", 3: "Marek", 4: "Jakub"}
+farba = ["red", "blue", "green", "yellow"]
+pos1 = [(1,3), (1,11), (16,3), (16,11)]
 
 class Hrac:
     def __init__(self, id: int, farba: str, pos: tuple[int, int]):

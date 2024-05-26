@@ -40,6 +40,11 @@ class Hra:
         self.running = True
 
         self.background_map = pg.image.load("mapa01.png").convert_alpha()
+        self.ego = pg.image.load(r"obrazky/ego.png").convert_alpha()
+        self.rytmus = pg.image.load(r"obrazky/rytmus.png").convert_alpha()
+        self.kuly = pg.image.load(r"obrazky/kuly.png").convert_alpha()
+        self.fusino = pg.image.load(r"obrazky/fusino.png").convert_alpha()
+
         # self.cerveny_panacik = pg.image.load(r"panacik_sprites/cerveny_hrac.ase")
 
         self.hraci: list[object] = self.vytvor_hracov(n_hracov)
@@ -127,6 +132,10 @@ class Hra:
         while self.running:
             self.screen.fill((128, 128, 128))
             self.screen.blit(self.background_map, (0,0))
+            self.screen.blit(self.ego, (120,60))
+            self.screen.blit(self.rytmus, (120,730))
+            self.screen.blit(self.kuly, (1020,60))
+            self.screen.blit(self.fusino, (1020,730))
             
             # cas
             self.cas.update()

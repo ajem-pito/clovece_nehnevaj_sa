@@ -1,6 +1,6 @@
 from test_panacik import Panacik
 
-meno_dict = {0: "Karolina", 1: "Urban", 2: "Kamil", 3: "Zelmira"}
+meno_dict = {0: "Ego", 1: "Rytmus", 2: "Kuly", 3: "Fusino23"}
 # mena = ["Jan", "Jozef", "Marek", "Peter", "Jana"]
 farba = ["red", "blue", "green", "yellow"]
 pos1 = [(1,3), (1,11), (16,3), (16,11)]

@@ -58,7 +58,7 @@ class Menu:
         for k in range(len(self.texty)):
             self.tlacidla.append(Vytvor_text(None, self.texty[k], (SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + k*self.velkost_textu[1]), 30, 0, r"font/ONESIZE.ttf", 0, button=True))
 
-        self.podpis = Vytvor_text(None, "Jakub J. Stefancik, 2024", (SCREEN_WIDTH-350, SCREEN_HEIGHT-30), 25, 0, font_path, 0, farba=(128, 128, 128))
+        self.podpis = Vytvor_text(None, "Jakub J. Stefancik, Jakub Pitonak 2024", (SCREEN_WIDTH-540, SCREEN_HEIGHT-30), 25, 0, font_path, 0, farba=(128, 128, 128))
 
     def background_panacik(self) -> None:        
         farba = ["red", "green", "blue", "yellow"]

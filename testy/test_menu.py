@@ -2,6 +2,7 @@ import pygame as pg
 import random as rand
 
 from test_panacik import Panacik
+from test_hra import Hra
 pg.init()
 
 SCREEN_WIDTH = 1500
@@ -53,7 +54,7 @@ class Menu:
         # print(width)
 
         self.tlacidla = []
-        self.texty = ["START", "SAVE", "NASTAVENIA"]
+        self.texty = ["START", "SAVE", "NASTAVENIA", "KONIEC"]
         for k in range(len(self.texty)):
             self.tlacidla.append(Vytvor_text(None, self.texty[k], (SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + k*self.velkost_textu[1]), 30, 0, r"font/ONESIZE.ttf", 0, button=True))
 
@@ -69,6 +70,7 @@ class Menu:
                 self.panacikovia.append(Panacik(x,y,farbicka,1, scale=1, speed=3))
 
     def menu_loop(self) -> None:
+        hra = Hra(4)
         while self.running:
             self.screen.fill((255,255,255))
 
@@ -78,12 +80,17 @@ class Menu:
                 elif event.type == pg.MOUSEBUTTONDOWN:
                         if event.button == 1:
                             if self.tlacidla[0].on_click(pg.mouse.get_pos()):
-                                print("Start")
+                                self.running = False
+                                hra.game_loop()
                             elif self.tlacidla[1].on_click(pg.mouse.get_pos()):
                                 print("Save")
                             elif self.tlacidla[2].on_click(pg.mouse.get_pos()):
                                 print("Nastavenia")
-                                
+                            elif self.tlacidla[3].on_click(pg.mouse.get_pos()):
+                                print("Koniec")
+                                self.running = False
+                                # remove system32
+
                             # for tlacidlo in self.tlacidla:
                             #     if tlacidlo.on_click(pg.mouse.get_pos()):
                             #         print(tlacidlo.origo_text)

@@ -1,8 +1,12 @@
 from test_panacik import Panacik
 
-meno_dict = {0: "Jano", 1: "Filip", 2: "Nina", 3: "Marek", 4: "Jakub"}
+meno_dict = {0: "Karolina", 1: "Urban", 2: "Kamil", 3: "Zelmira"}
+# mena = ["Jan", "Jozef", "Marek", "Peter", "Jana"]
 farba = ["red", "blue", "green", "yellow"]
 pos1 = [(1,3), (1,11), (16,3), (16,11)]
+
+# enumerate(mena)
+# print(list(enumerate(mena)))
 
 class Hrac:
     def __init__(self, id: int, farba: str, pos: tuple[int, int]):
@@ -10,6 +14,7 @@ class Hrac:
         self.farba = farba
         self.x, self.y = pos # pos == indexy x,y v mriezke
         self.kliknuty = None
+        self.hody_kockou: list = []
 
         self.panacikovia = self.vytvor_panacikov(4)
 
@@ -29,6 +34,7 @@ class NPC:
         self.farba = farba
         self.x, self.y = pos # pos == indexy x,y v mriezke
         self.kliknuty = None
+        self.hody_kockou: list = []
 
         self.panacikovia = self.vytvor_panacikov(4)
 

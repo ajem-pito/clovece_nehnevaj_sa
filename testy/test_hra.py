@@ -13,12 +13,20 @@ pg.init()
 # konstanty - velkost okna
 SCREEN_WIDTH = 1500
 SCREEN_HEIGHT = 900
+
 # konstanty - farby
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+
+ORANGE = (255, 165, 0)
+PURPLE = (128, 0, 128)
+PINK = (255, 192, 203)
+BROWN = (165, 42, 42)
+
 
 VELKOST = (30,60)
 FPS = 60
@@ -42,25 +50,39 @@ class Hra:
         self.cas = Cas()
 
     def vytvor_UI(self) -> None:
-        self.hrac_na_rade_text = Vytvor_text(screen=None, text="HRAC NA RADE:", pos=(0,0), font_velkost=22, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
-                                        farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
-        self.hrac_na_rade_text2 = Vytvor_text(screen=None, text="1", pos=(0,0), font_velkost=20, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
-                                        farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
-        self.hod_kockou_button = Vytvor_text(screen=None, text="HOD KOCKOU", pos=(0,0), font_velkost=30, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
-                                             farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=True)
-        self.sprava_text = Vytvor_text(screen=None, text="STATUS:", pos=(0,0), font_velkost=22, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
-                                       farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
-        
-        self.hrac_na_rade_text.x = 22*60 - 15
-        self.hrac_na_rade_text.y = 20
+        self.UI_list = []
+        texty = ["HRAC NA RADE:", "1", "HOD KOCKOU", "STATUS:", "Index out of range"]
+        pozicie = [(23*60, 20), (23*60, 70), (23*60, 3*60), (23*60, 6*60), (23*60, 6*60+20)]
+        font_velkosti = [22, 50, 30, 22, 22]
+        farby = [(0,0,0), (0,0,0), (0,0,0), (0,0,0), ORANGE]
+        buttons = [True, True, True, True, True]
 
-        self.hod_kockou_button.x = 23*60
-        self.hod_kockou_button.y = 3*60
+        for text, pos, font_velkost, farba , button in zip(texty, pozicie, font_velkosti, farby, buttons):
+            self.UI_list.append(Vytvor_text(screen=None, text=text, pos=pos, font_velkost=font_velkost, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+                                            farba=farba, hover_farba=(255,0,0), reverse=False, button=button))
 
-        self.sprava_text.x = 22*60 + 15
-        self.sprava_text.y = 6*60
+        # self.hrac_na_rade_text = Vytvor_text(screen=None, text="HRAC NA RADE:", pos=(0,0), font_velkost=22, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+        #                                 farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
+        # self.hrac_na_rade_text2 = Vytvor_text(screen=None, text="1", pos=(0,0), font_velkost=50, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+        #                                 farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
+        # self.hod_kockou_button = Vytvor_text(screen=None, text="HOD KOCKOU", pos=(0,0), font_velkost=30, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+        #                                      farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=True)
+        # self.sprava_text = Vytvor_text(screen=None, text="STATUS:", pos=(0,0), font_velkost=22, max_velkost=0, font_path=r"font/ONESIZE.ttf", speed=1,
+        #                                farba=(0,0,0), hover_farba=(255,0,0), reverse=False, button=False)
         
-        self.UI_list = [self.hrac_na_rade_text, self.hod_kockou_button, self.sprava_text]
+        # self.hrac_na_rade_text.x = 22*60 - 15
+        # self.hrac_na_rade_text.y = 20
+
+        # self.hrac_na_rade_text2.x = 22*60
+        # self.hrac_na_rade_text2.y = 40
+
+        # self.hod_kockou_button.x = 23*60
+        # self.hod_kockou_button.y = 3*60
+
+        # self.sprava_text.x = 22*60 + 15
+        # self.sprava_text.y = 6*60
+        
+        # self.UI_list = [self.hrac_na_rade_text, self.hrac_na_rade_text2, self.hod_kockou_button, self.sprava_text]
 
     def vytvor_hracov(self, n) -> list[object]:
         self.hrac_n = 0
@@ -99,62 +121,79 @@ class Hra:
     def game_loop(self) -> None:
         hod_kockou_var = Hod_kockou()
         n = 1
+        hrac_na_rade = next(iter(self.hraci)) # obrovsky shouout pre niekoho ze som toto videl edit: strasna picovina, nech sa dotycni zabije
+        n2 = 0
 
         while self.running:
-
-            # cas - nefunguje
+            self.screen.fill((128, 128, 128))
+            self.screen.blit(self.background_map, (0,0))
+            
+            # cas
             self.cas.update()
             image, rect = self.cas.text.draw()
             self.screen.blit(image, rect)
-
-            self.screen.fill((128, 128, 128))
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 1:
-                        if self.hod_kockou_button.on_click(pg.mouse.get_pos()):
+                        if self.UI_list[2].on_click(pg.mouse.get_pos()):
                             n = self.logika.hod_kockou(self.hraci[self.hrac_n])
-                            print(n)
-            
-            self.screen.blit(self.background_map, (0,0))
+                            n2 = (n2 + 1) % 4
+
             self.screen.blit(hod_kockou_var.return_image(n), (22*60,3*60+30))
 
+            hrac_na_rade = self.hraci[n2]
+            self.UI_list[1].text = f"{hrac_na_rade}"
+            self.UI_list[1].farba = hrac_na_rade.farba.upper()
             for text in self.UI_list:
-                if self.hod_kockou_button.rect.collidepoint(pg.mouse.get_pos()):
-                    self.hod_kockou_button.text = '> ' + self.hod_kockou_button.origo_text + ' <'
-                    self.hod_kockou_button.hover = True
+                if self.UI_list[2].rect.collidepoint(pg.mouse.get_pos()):
+                    self.UI_list[2].text = '> ' + self.UI_list[2].origo_text + ' <'
+                    self.UI_list[2].hover = True
                 else:
-                    self.hod_kockou_button.text = self.hod_kockou_button.origo_text
-                    self.hod_kockou_button.hover = False
+                    self.UI_list[2].text = self.UI_list[2].origo_text
+                    self.UI_list[2].hover = False
 
                 image, rect = text.draw()
                 self.screen.blit(image, rect)
 
-            # sluzi asi len na to, aby sa panacik zobrazil na spravnom mieste
+            # vykreslenie panacikov hraca ktory je na rade
+            for panacik in hrac_na_rade.panacikovia:
+                x = panacik.x * 60 + 15
+                y = panacik.y * 60
+
+                if panacik.rect.collidepoint(pg.mouse.get_pos()) or panacik.is_clicked_var == True:
+                    self.screen.blit(panacik.hover(), (x, y))
+                
+                # if event.type == pg.MOUSEBUTTONDOWN:
+                #     if event.button == 1:
+                #         if panacik.rect.collidepoint(pg.mouse.get_pos()):
+                #             panacik.is_clicked_var = True if not panacik.is_clicked_var else False
+                #             hrac_na_rade.kliknuty = panacik if panacik.is_clicked_var else None
+                #             continue
+
+                elif panacik.is_clicked_var:
+                    self.screen.blit(panacik.hover(), (x, y))
+
+                else:
+                    self.screen.blit(panacik.idle(), (x, y))
+
+
+            # sluzi asi len na to, aby sa kazdy panacik, okrem toho co je na rade, zobrazil
             for hrac in self.hraci:
-                for panacik in hrac.panacikovia:
-                    x = panacik.x * 60 + 15
-                    y = panacik.y * 60  
-                    
-                    if panacik.rect.collidepoint(pg.mouse.get_pos()) or panacik.is_clicked_var == True:
-                        self.screen.blit(panacik.hover(), (x, y))
-                    
-                    elif panacik.timer == 0:
-                        self.screen.blit(panacik.idle(), (x, y))
-
-                    else:
+                if hrac.id != hrac_na_rade.id:
+                    for panacik in hrac.panacikovia:
+                        x = panacik.x * 60 + 15
+                        y = panacik.y * 60  
                         self.screen.blit(panacik.get_image(0), (x, y))
-                    
-                    panacik.timer += 1
-
+                        
             # debugy
-            self.debug_mriezka()
+            # self.debug_mriezka()
 
             # update a ticky
             pg.display.flip()
-            self.clock.tick(FPS) 
+            self.clock.tick(15) 
 
 class Vytvor_text:
     def __init__(self, screen: pg.Surface, text: str, pos: tuple[int, int], font_velkost: int, max_velkost: int, font_path: str = None, speed: float = 1,
@@ -207,7 +246,8 @@ class Cas:
         cas = pg.time.get_ticks()
         sekundy = cas // 1000
         minuty = sekundy // 60
-        self.text.text = f"{minuty}:{sekundy}"
+        sekundy %= 60
+        self.text.text = f"{minuty}:{sekundy:02}"
 
 if __name__ == "__main__":
     hra = Hra(n_hracov=3)

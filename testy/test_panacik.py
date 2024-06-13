@@ -2,9 +2,12 @@ import pygame as pg
 
 class Panacik:
     def __init__(self, x:int, y:int, farba:str = "red", frame:int = 0, width=30, height=60, scale:int=1, screen:pg.Surface = None, speed:int = 5) -> None:
+        self.id = f"{farba[0]}{id(self)} "
         self.screen = screen
-        self.x = x
+        self.x = x # indexy x,y v mriezke, je to skor na grafiku
         self.y = y
+        self.pos: tuple = ...# indexy x,y v mriezke, je to skor na logiku
+        self.poloha: int = 0 # fr index
         self.width = width
         self.height = height
         self.scale = scale
@@ -12,8 +15,9 @@ class Panacik:
         self.speed = speed
         self.is_clicked_var = False
         self.pohyb_bool: bool = False # nie som si isty ci to je potreba ci niekedy pouzijem ale necham este
-        self.poloha: int = 0
         self.timer = 0
+        self.na_hracie_ploche = False
+        self.cesta: list = ... # cesta panacika spociva z self.start/self.mapa + self.domceky
 
         self.hover_var = 0
         self.idle_var = 0

@@ -3,33 +3,77 @@ import random as rand
 
 class Logika:
     def __init__(self, mapa) -> None:
-        self.mapa: list[tuple[int,int]] = [
-            (1,5, None), (3,5), (5,5), (7,5), (7,4), (7,3), (7,2), (7,1), (9,1), (11,1), (13,1), (13,2),
-            (13,3, None), (13,4), (13,5), (15,5), (17,5), (19,5), (19,6), (19,7), (19,8), (19,9), (17,9),
-            (15,9, None), (13,9), (13,10), (13,11), (13,12), (13,13), (11,13), (9,13), (7,13), (7,12), (7,13),
-            (7,12, None), (7,11), (7,10), (7,9), (5,9), (3,9), (1,9), (1,8), (1,7), (1,6)
+        self.mapa: list[tuple[int,int, str]] = [
+            (1, 5, None), (3, 5, None), (5, 5, None), (7, 5, None), (7, 4, None), (7, 3, None), (7, 2, None), (7, 1, None), 
+            (9, 1, None), (11, 1, None), (13, 1, None), (13, 2, None), (13, 3, None), (13, 4, None), (13, 5, None), (15, 5, None),
+            (17, 5, None), (19, 5, None), (19, 6, None), (19, 7, None), (19, 8, None), (19, 9, None), (17, 9, None), (15, 9, None),
+            (13, 9, None), (13, 10, None), (13, 11, None), (13, 12, None), (13, 13, None), (11, 13, None), (9, 13, None), (7, 13, None),
+            (7, 12, None), (7, 13, None), (7, 12, None), (7, 11, None), (7, 10, None), (7, 9, None), (5, 9, None), (3, 9, None), (1, 9, None),
+            (1, 8, None), (1, 7, None), (1, 6, None)
         ]
+        
         self.domceky= {
             "red":[(3,7, None), (4, 7, None), (5, 7, None), (6, 7, None)],
-            "blue":[(10,8, None), (10,9, None), (10,10, None), (10,11, None)],
+            "blue":[(10,11, None), (10,10, None), (10, 9, None), (10, 8, None)],
             "green":[(10,3, None), (10,4, None), (10,5, None), (10,6, None)],
             "yellow":[(14, 7, None), (15, 7, None), (16, 7, None), (17, 7, None)]
         }
-        
-    def hod_kockou(self, hrac) -> int:
-        return rand.randint(1,6)
-        
-    def pohyb(self, panacik, n) -> bool:
-        pass
 
-    def vyhodit(self, panacik, n) -> bool:
-        pass
+        self.starty = {
+            "red":(1, 5, None), "blue":(7, 13, None), "green":(13, 1, None), "yellow":(19, 9, None)
+        }
     
-    def domcek(self, n) -> bool:
-        pass
+        # cesta panacika spociva z self.mapa + self.domceky
 
-    def koniec(self) -> bool:
-        pass
+    def hod_kockou(self):
+        return rand.randint(1, 6)
+
+    def pohyb(self, hrac, panacik, pocet_krokov):
+        if panacik.pos + pocet_krokov >= len(panacik.cesta):
+            return False
+        
+
+        # if self.mapa[panacik.cesta[panacik.pos + pocet_krokov]] is not None:
+        #     if self.vyhodit(hrac, panacik):
+        #         return False
+
+        panacik.pos += pocet_krokov
+        panacik.x, panacik.y = panacik.cesta[panacik.pos][:2]
+
+    def vyhodit(self, hrac, panacik):
+        for hrac in self.hraci:
+            for panacik in hrac.panacikovia:
+                if panacik.x == panacik.x and panacik.y == panacik.y and panacik not in hrac.panacikovia:
+                    panacik.poloha = 0
+                    panacik.x, panacik.y = hrac.pos
+                    return True
+        return False
+    
+    # ak hadze 6ku, moze si vybrat ci chce vytiahnut panacika a hadze znova kockou
+    def vyber_panacika(self, hrac, panacik):
+        if self.starty[hrac.farba] not in self.mapa:
+            return False
+        
+        pos = self.starty[hrac.farba]
+        panacik.x = pos[0]
+        panacik.y = pos[1]
+        panacik.cesta = self.vytvor_cestu((pos[0], pos[1], None), hrac.farba)
+        panacik.pos = panacik.cesta.index((pos[0], pos[1], None))
+        self.mapa[self.mapa.index(pos)] = (pos[0], pos[1], panacik.id)
+        panacik.na_hracie_ploche = True
+        return True
+
+    def koniec(self, hrac):
+        if hrac.v_domceku == 4:
+            return True
+        return False
+    
+    def vytvor_cestu(self, start, farba) -> list:
+        index_of_start = self.mapa.index(start)
+        after_start = self.mapa[index_of_start+1:]
+        before_start = self.mapa[:index_of_start]
+        path = [start] + after_start + before_start + self.domceky[farba]
+        return path
 
 class Hod_kockou:
     def __init__(self, scale=1) -> None:
@@ -101,3 +145,8 @@ class Hod_kockou:
         
 #         # ak vsetko prebehne v poriadku, ide dalej hrac na rade
 #         hrac_na_rade = next(iter(logika.domceky.keys()))
+
+
+if __name__ == "__main__":    
+    logika = Logika()
+    pg.quit()

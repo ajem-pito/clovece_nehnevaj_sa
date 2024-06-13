@@ -16,7 +16,7 @@ class Logika:
             "red":[(3,7, None), (4, 7, None), (5, 7, None), (6, 7, None)],
             "blue":[(10,11, None), (10,10, None), (10, 9, None), (10, 8, None)],
             "green":[(10,3, None), (10,4, None), (10,5, None), (10,6, None)],
-            "yellow":[(14, 7, None), (15, 7, None), (16, 7, None), (17, 7, None)]
+            "yellow":[(17, 7, None), (16, 7, None), (15, 7, None), (14, 7, None)]
         }
 
         self.starty = {
